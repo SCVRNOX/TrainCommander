@@ -1,0 +1,39 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Release
+        run: msbuild TrainCommander.sln /p:Configuration=Release /p:Platform=x64 /p:PostBuildEventUseInBuild=false
+
+      - name: Prepare Assets
+        run: |
+          Copy-Item "x64\TrainCommander.dll" "TrainCommander.dll"
+          Copy-Item "src\icon.png" "icon.png"
+        shell: pwsh
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            TrainCommander.dll
+            icon.png
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

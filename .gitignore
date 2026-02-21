@@ -1,0 +1,21 @@
+# Build output
+x64/
+Debug/
+Release/
+*.user
+*.suo
+.vs/
+
+# Compiled objects
+*.obj
+*.pdb
+*.iobj
+*.ipdb
+*.lib
+*.exp
+
+# But keep the DLL output path reference
+!x64/.gitkeep
+
+# Timers source (local reference only)
+timers/
