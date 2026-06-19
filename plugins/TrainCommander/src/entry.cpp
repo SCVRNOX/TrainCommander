@@ -83,7 +83,7 @@ extern "C" __declspec(dllexport) AddonDefinition_t *GetAddonDef() {
   AddonDef.Name = "Train Commander";
   AddonDef.Version.Major = 1;
   AddonDef.Version.Minor = 0;
-  AddonDef.Version.Build = 0;
+  AddonDef.Version.Build = 5;
   AddonDef.Version.Revision = 0;
   AddonDef.Author = "SCVRNOX";
   AddonDef.Description = "Manage and track farm trains internally.";
