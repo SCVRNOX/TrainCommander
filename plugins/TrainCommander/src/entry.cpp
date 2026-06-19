@@ -81,9 +81,9 @@ extern "C" __declspec(dllexport) AddonDefinition_t *GetAddonDef() {
   AddonDef.Signature = 1005128; // Unique ID
   AddonDef.APIVersion = NEXUS_API_VERSION;
   AddonDef.Name = "Train Commander";
-  AddonDef.Version.Major = 1;
+  AddonDef.Version.Major = 2;
   AddonDef.Version.Minor = 0;
-  AddonDef.Version.Build = 5;
+  AddonDef.Version.Build = 0;
   AddonDef.Version.Revision = 0;
   AddonDef.Author = "SCVRNOX";
   AddonDef.Description = "Manage and track farm trains internally.";

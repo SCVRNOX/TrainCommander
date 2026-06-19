@@ -89,7 +89,8 @@ void EventUI::Render() {
       ImGui::SetCursorPosY(ImGui::GetCursorPosY() - offset);
       ImGui::SameLine();
     }
-    ImGui::Text("Train Commander - Event Catalog");
+    ImGui::TextColored(ImVec4(180 / 255.0f, 255 / 255.0f, 205 / 255.0f, 1.0f), "Train Commander - Event Catalog");
+    ImGui::TextColored(ImVec4(190 / 255.0f, 210 / 255.0f, 255 / 255.0f, 180 / 255.0f), "Hover events to see more info and click to append to the active train.");
     ImGui::Separator();
 
     if (m_ShowNoActiveTrainWarning) {
@@ -126,28 +127,6 @@ void EventUI::Render() {
         }
       }
 
-      if (ImGui::Button(m_SortByProfit ? "Sort: Profit" : "Sort: Category")) {
-        m_SortByProfit = !m_SortByProfit;
-      }
-      ImGui::SameLine();
-      ImGui::TextDisabled(
-          "(?) Timeline rows are ordered by highest avg profit");
-
-      if (m_SortByProfit) {
-        std::sort(order.begin(), order.end(),
-                  [&](const std::string &a, const std::string &b) {
-                    float maxA = 0, maxB = 0;
-                    if (groupedEvents.count(a)) {
-                      for (const auto &ev : groupedEvents[a])
-                        maxA = (std::max)(maxA, ev.GoldPerHour);
-                    }
-                    if (groupedEvents.count(b)) {
-                      for (const auto &ev : groupedEvents[b])
-                        maxB = (std::max)(maxB, ev.GoldPerHour);
-                    }
-                    return maxA > maxB;
-                  });
-      }
 
       float availableWidth = ImGui::GetContentRegionAvail().x - 190.0f;
       float pixelsPerMinute =
@@ -197,7 +176,12 @@ void EventUI::Render() {
 
           ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
                                (rowHeight - ImGui::GetTextLineHeight()) * 0.5f);
-          ImGui::Text("%s", cat.c_str());
+          ImU32 categoryColor = GetCategoryBaseColor(cat);
+          ImGui::TextColored(ImColor((categoryColor & 0xFF) / 255.0f,
+                                     ((categoryColor >> 8) & 0xFF) / 255.0f,
+                                     ((categoryColor >> 16) & 0xFF) / 255.0f,
+                                     1.0f),
+                             "%s", cat.c_str());
 
           ImGui::TableSetColumnIndex(1);
           ImVec2 cellPos = ImGui::GetCursorScreenPos();
@@ -276,8 +260,6 @@ void EventUI::Render() {
                   newStep.SpawnMinuteUTC = spawnMinute;
                 }
                 newStep.DurationMinutes = ev.DurationMinutes;
-                newStep.GoldPerHour = ev.GoldPerHour;
-                newStep.ProfitBreakdown = ev.ProfitBreakdown;
 
                 auto activeTrain = m_Manager->GetActiveTrain();
                 activeTrain->Steps.push_back(newStep);
@@ -288,11 +270,15 @@ void EventUI::Render() {
               }
             }
 
-            drawList->AddRectFilled(blockMin, blockMax, blockColor, 0.0f);
-            drawList->AddRect(blockMin, blockMax, IM_COL32(0, 0, 0, 255), 0.0f,
-                              0, 1.0f);
+            drawList->AddRectFilled(blockMin, blockMax, blockColor, 4.0f);
+            drawList->AddRect(blockMin, blockMax, IM_COL32(255, 255, 255, 100), 4.0f,
+                              0, 1.5f);
             if (isHovered) {
-              drawList->AddRectFilled(blockMin, blockMax, hoverColor, 0.0f);
+              ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+              drawList->AddRectFilled(blockMin, blockMax,
+                                      IM_COL32(255, 255, 255, 70), 0.0f);
+              drawList->AddRect(blockMin, blockMax, IM_COL32(255, 255, 255, 220),
+                                0.0f, 0, 2.0f);
 
               int totalSecs =
                   static_cast<int>(std::abs(ev.ExactMinutesUntilSpawn * 60.0f));
@@ -303,21 +289,11 @@ void EventUI::Render() {
                       : "in " + std::to_string(totalSecs / 60) + "m " +
                             std::to_string(totalSecs % 60) + "s";
 
-              std::string tooltip = "Click to Append:\n" + ev.Definition.Name +
-                                    "\nFull name: " + ev.Definition.Name +
-                                    "\n" + hoverTimeStr +
-                                    "\nWaypoint: " + ev.Definition.WaypointCode;
-              if (ev.GoldPerHour > 0) {
-                char profitBuf[64];
-                snprintf(profitBuf, sizeof(profitBuf), "\nProfit: %.1f g/h",
-                         ev.GoldPerHour);
-                tooltip += profitBuf;
-                if (!ev.ProfitBreakdown.empty()) {
-                  tooltip += "\nSource: " + ev.ProfitBreakdown;
-                }
-              } else {
-                tooltip += "\nProfit: unknown";
-              }
+              std::string tooltip = "Click to add to active train:\n" +
+                                    ev.Definition.Name +
+                                    "\nMap: " + ev.Definition.Map +
+                                    "\nWaypoint: " + ev.Definition.WaypointCode +
+                                    "\n" + hoverTimeStr;
               ImGui::SetTooltip("%s", tooltip.c_str());
             }
 
@@ -328,13 +304,6 @@ void EventUI::Render() {
             drawList->PushClipRect(blockMin, blockMax, true);
 
             std::string displayName = ev.Definition.Name;
-            char pBuf[64];
-            if (ev.GoldPerHour > 0) {
-              snprintf(pBuf, sizeof(pBuf), " (%.1fg/h)", ev.GoldPerHour);
-            } else {
-              snprintf(pBuf, sizeof(pBuf), " (unknown g/h)");
-            }
-            displayName += pBuf;
             drawList->AddText(textPos, IM_COL32(255, 255, 255, 255),
                               displayName.c_str());
             drawList->PopClipRect();

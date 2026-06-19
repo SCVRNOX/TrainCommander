@@ -19,16 +19,23 @@ void EditorUI::Render() {
 
   ImGui::SetNextWindowSize(ImVec2(800, 500), ImGuiCond_FirstUseEver);
   if (ImGui::Begin("Train Commander Editor", &m_Visible)) {
+    ImGui::TextColored(ImVec4(170 / 255.0f, 240 / 255.0f, 220 / 255.0f, 1.0f), "Train Commander Editor");
+    ImGui::Separator();
     if (ImGui::Button("Open Event Catalog (Live Schedule)", ImVec2(0, 30))) {
       if (m_EventUI)
         m_EventUI->Show();
     }
+    ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(70, 135, 170, 200));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(95, 170, 215, 220));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(80, 150, 190, 220));
     ImGui::Separator();
 
     ImGui::Columns(2, "EditorColumns", true);
     ImGui::SetColumnWidth(0, 250);
 
     ImGui::Separator();
+
+    ImGui::TextColored(ImVec4(255 / 255.0f, 225 / 255.0f, 185 / 255.0f, 1.0f), "Train List");
 
     for (int i = 0; i < (int)trains.size(); ++i) {
       bool isSelected = (m_SelectedTrainIndex == i);
@@ -40,6 +47,7 @@ void EditorUI::Render() {
       }
     }
 
+    ImGui::PopStyleColor(3);
     ImGui::Separator();
     if (ImGui::Button("+ Create New Train", ImVec2(-1, 0))) {
       TrainTemplate newTrain;
@@ -130,21 +138,10 @@ void EditorUI::Render() {
       }
 
       ImGui::Separator();
-      float totalTrainGoldPerHour = 0.0f;
-      for (const auto &step : currTrain.Steps)
-        totalTrainGoldPerHour += step.GoldPerHour;
-      if (!currTrain.Steps.empty()) {
-        float averageGoldPerHour = totalTrainGoldPerHour /
-                                   static_cast<float>(currTrain.Steps.size());
-        ImGui::Text("Train Profit: %.1f g/h total (%.1f g/h avg per step)",
-                    totalTrainGoldPerHour, averageGoldPerHour);
-      } else {
-        ImGui::Text("Train Profit: 0.0 g/h total. Add events to see profit.");
-      }
-
-      ImGui::Text("Steps:");
+      ImGui::TextColored(ImVec4(180 / 255.0f, 220 / 255.0f, 255 / 255.0f, 1.0f), "Steps:");
 
       // Step List
+      ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(24, 40, 65, 255));
       ImGui::BeginChild("StepList", ImVec2(0, 200), true);
       int moveFrom = -1, moveTo = -1;
       for (int j = 0; j < (int)currTrain.Steps.size(); ++j) {
@@ -175,16 +172,8 @@ void EditorUI::Render() {
         ImGui::PopID();
 
         std::string label = std::to_string(j + 1) + ". " +
-                            currTrain.Steps[j].Title;
-        if (currTrain.Steps[j].GoldPerHour > 0) {
-          char stepProfitBuf[32];
-          snprintf(stepProfitBuf, sizeof(stepProfitBuf), " (%.1fg/h)",
-                   currTrain.Steps[j].GoldPerHour);
-          label += stepProfitBuf;
-        } else {
-          label += " (unknown g/h)";
-        }
-        label += "##step" + std::to_string(j);
+                            currTrain.Steps[j].Title +
+                            "##step" + std::to_string(j);
         if (ImGui::Selectable(label.c_str(), isStepSelected)) {
           m_SelectedStepIndex = j;
         }
@@ -198,6 +187,7 @@ void EditorUI::Render() {
           m_SelectedStepIndex = moveFrom;
       }
       ImGui::EndChild();
+      ImGui::PopStyleColor();
 
       if (ImGui::Button("Add Step", ImVec2(120, 0))) {
         TrainStep step;
@@ -213,6 +203,7 @@ void EditorUI::Render() {
       }
 
       ImGui::Separator();
+      ImGui::TextColored(ImVec4(180 / 255.0f, 220 / 255.0f, 255 / 255.0f, 1.0f), "Steps:");
 
       // Step Details
       if (m_SelectedStepIndex >= 0 &&
