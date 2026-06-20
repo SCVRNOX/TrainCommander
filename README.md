@@ -31,6 +31,14 @@ A Guild Wars 2 Nexus addon for managing and running farm trains.
 - Click an event block to add it to your active train
 - Use the in-game overlay to navigate steps and broadcast messages to your squad
 
+##Images
+<img width="1287" height="809" alt="image" src="https://github.com/user-attachments/assets/9740b024-c0ad-4e28-8c43-8c7b715f5075" />
+<img width="1783" height="721" alt="image" src="https://github.com/user-attachments/assets/04b33d89-ddf0-43c5-8630-02371256921f" />
+<img width="373" height="606" alt="image" src="https://github.com/user-attachments/assets/1483b3de-4135-4217-8be8-4e75ed2b1654" />
+
+
+
+
 ## Building from Source
 
 **Requirements:**
