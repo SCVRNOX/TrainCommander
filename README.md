@@ -27,7 +27,6 @@ A Guild Wars 2 Nexus addon for managing and running farm trains.
 
 ## Usage
 
-- Press **Shift+Alt+T** to open the Train Editor
 - Use the **Event Catalog** button to browse the live meta event schedule
 - Click an event block to add it to your active train
 - Use the in-game overlay to navigate steps and broadcast messages to your squad
