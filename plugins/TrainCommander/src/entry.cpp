@@ -78,12 +78,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call,
 
 // Export for Nexus
 extern "C" __declspec(dllexport) AddonDefinition_t *GetAddonDef() {
-  AddonDef.Signature = 1005128; // Unique ID
+  AddonDef.Signature = 0x54434D44;
   AddonDef.APIVersion = NEXUS_API_VERSION;
   AddonDef.Name = "Train Commander";
   AddonDef.Version.Major = 2;
   AddonDef.Version.Minor = 0;
-  AddonDef.Version.Build = 0;
+  AddonDef.Version.Build = 1; // version 2.0.1
   AddonDef.Version.Revision = 0;
   AddonDef.Author = "SCVRNOX";
   AddonDef.Description = "Manage and track farm trains internally.";
