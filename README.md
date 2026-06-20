@@ -2,6 +2,8 @@
 
 A Guild Wars 2 Nexus addon for managing and running farm trains.
 
+> Note: This addon was developed with the help of artificial intelligence. If you disagree with that, please refrain from using it.
+
 ## Features
 
 - 📋 **Train Templates** — Create, save, and share ordered sequences of farm events
@@ -9,6 +11,7 @@ A Guild Wars 2 Nexus addon for managing and running farm trains.
 - 📢 **One-click Broadcasting** — Copy waypoints, squad messages and mechanics to clipboard instantly
 - 🔁 **Live Countdowns** — Each train step shows a rolling daily countdown to its next scheduled spawn
 - 📤 **Import/Export** — Share train templates via Base64 clipboard strings
+ - 💬 **Custom Messages & Mechanics** — Add per-train custom squad messages and mechanic notes; save and copy them quickly from the overlay
 
 ## Installation (via Nexus)
 
