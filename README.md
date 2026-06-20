@@ -13,7 +13,7 @@ A Guild Wars 2 Nexus addon for managing and running farm trains.
 - 📤 **Import/Export** — Share train templates via Base64 clipboard strings
  - 💬 **Custom Messages & Mechanics** — Add per-train custom squad messages and mechanic notes; save and copy them quickly from the overlay
 
-## Installation (via Nexus)
+## Installation (via Nexus) (Coming soon hopefully)
 
 1. Open **Nexus** in Guild Wars 2
 2. Search for **Train Commander**
