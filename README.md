@@ -2,7 +2,7 @@
 
 A Guild Wars 2 Nexus addon for managing and running farm trains.
 
-> Note: This addon was developed with the help of artificial intelligence. If you disagree with that, please refrain from using it.
+> Note: This addon was developed with the help of KI. If you disagree with that, please refrain from using it.
 
 ## Features
 
