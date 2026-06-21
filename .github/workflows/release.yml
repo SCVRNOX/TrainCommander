@@ -1,39 +1,51 @@
-name: Build and Release
+# .github/workflows/build_release.yml
+
+name: Build and Release TrainCommander
 
 on:
   push:
-    tags:
-      - 'v*'
-
-permissions:
-  contents: write
+    branches:
+      - main # Or your primary development branch name
+  tags:
+    # This ensures the build runs specifically when a tag (like v2.0.7) is pushed
+    - 'v*.*.*' 
 
 jobs:
-  build:
-    runs-on: windows-latest
-
+  build_and_test:
+    runs-on: windows-latest # Use a Windows runner matching your local OS
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Build Release
-        run: msbuild TrainCommander.sln /p:Configuration=Release /p:Platform=x64 /p:PostBuildEventUseInBuild=false
-
-      - name: Prepare Assets
-        run: |
-          Copy-Item "x64\TrainCommander.dll" "TrainCommander.dll"
-          Copy-Item "src\icon.png" "icon.png"
-        shell: pwsh
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      # Step 1: Checkout the code, ensuring we get the exact tagged version
+      - uses: actions/checkout@v4
         with:
-          files: |
-            TrainCommander.dll
-            icon.png
-          generate_release_notes: true
+          fetch-depth: 0 # Fetch all history to ensure tags are available
+
+      # Step 2: Setup environment (If needed, e.g., Visual Studio Build Tools)
+      # You might need a specific action or setup step here for MSBuild on Windows runners.
+      - name: Install Dependencies/Tools
+        run: |
+          # Add any necessary setup commands here (e.g., installing vcpkg dependencies)
+          echo "Setting up build environment..."
+
+      # Step 3: Build the Project
+      - name: Build DLL Artifact
+        run: |
+          # Use MSBuild with explicit parameters to match local settings
+          msbuild TrainCommander.vcxproj /p:Configuration=Release /p:Platform=x64
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass any necessary environment variables here (e.g., API keys, paths)
+
+      # Step 4: Artifact Upload (Crucial for version control)
+      - name: Upload DLL Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrainCommander-DLL-${{ github.ref_name }} # Names the artifact based on the tag/branch
+          path: x64/TrainCommander.dll
+
+# Optional: A separate job for testing if needed
+# test_job:
+#   needs: build_and_test
+#   runs-on: windows-latest
+#   steps:
+#     - name: Run Tests
+#       run: |
+#         # Execute your unit tests here, ensuring they use the built DLL artifact.
