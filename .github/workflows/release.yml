@@ -5,10 +5,10 @@ name: Build and Release TrainCommander
 on:
   push:
     branches:
-      - main # Or your primary development branch name
+      - main # Trigger on pushes to the main branch
   tags:
-    # This ensures the build runs specifically when a tag (like v2.0.7) is pushed
-    - 'v*.*.*' 
+    # This correctly triggers the workflow when a tag matching vX.Y.Z is pushed
+    - 'v[0-9]*.[0-9]*.[0-9]*' 
 
 jobs:
   build_and_test:
@@ -19,12 +19,11 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history to ensure tags are available
 
-      # Step 2: Setup environment (If needed, e.g., Visual Studio Build Tools)
-      # You might need a specific action or setup step here for MSBuild on Windows runners.
+      # Step 2: Setup environment (If needed)
       - name: Install Dependencies/Tools
         run: |
-          # Add any necessary setup commands here (e.g., installing vcpkg dependencies)
           echo "Setting up build environment..."
+          # Add any necessary setup commands here (e.g., installing vcpkg dependencies)
 
       # Step 3: Build the Project
       - name: Build DLL Artifact
@@ -40,12 +39,3 @@ jobs:
         with:
           name: TrainCommander-DLL-${{ github.ref_name }} # Names the artifact based on the tag/branch
           path: x64/TrainCommander.dll
-
-# Optional: A separate job for testing if needed
-# test_job:
-#   needs: build_and_test
-#   runs-on: windows-latest
-#   steps:
-#     - name: Run Tests
-#       run: |
-#         # Execute your unit tests here, ensuring they use the built DLL artifact.
