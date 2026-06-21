@@ -3,6 +3,7 @@
 #include "event_ui.h"
 #include "imgui/imgui.h"
 #include <string>
+#include "train_types.h"
 
 EditorUI::EditorUI(AddonAPI_t *api, TrainManager *manager, EventUI *eventUI)
     : m_API(api), m_Manager(manager), m_EventUI(eventUI) {
@@ -242,6 +243,58 @@ void EditorUI::Render() {
         ImGui::SameLine();
         if (ImGui::Button("Copy Mechanics")) {
           ImGui::SetClipboardText(currStep.Mechanics.c_str());
+        }
+
+        ImGui::Spacing();
+        ImGui::TextDisabled("Custom Messages for this Step:");
+        
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(24, 40, 65, 255));
+        ImGui::BeginChild("CustomMessagesList", ImVec2(0, 120), true);
+        for (int m = 0; m < (int)currStep.CustomMessages.size(); ++m) {
+          ImGui::PushID(m);
+          if (ImGui::SmallButton("X")) {
+            currStep.CustomMessages.erase(currStep.CustomMessages.begin() + m);
+            ImGui::PopID();
+            ImGui::EndChild();
+            ImGui::PopStyleColor();
+            return;
+          }
+          ImGui::SameLine();
+          // Show the title, or if empty, show a placeholder
+          const char* titleToShow = currStep.CustomMessages[m].title.empty() ? 
+                                    "(no title)" : 
+                                    currStep.CustomMessages[m].title.c_str();
+          ImGui::Text("%s", titleToShow);
+          ImGui::PopID();
+        }
+        ImGui::EndChild();
+        ImGui::PopStyleColor();
+
+        if (ImGui::Button("Add Message")) {
+          ImGui::OpenPopup("Add Custom Message");
+        }
+        
+        if (ImGui::BeginPopupModal("Add Custom Message", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+          static char newTitle[256] = "";
+          static char newText[4096] = "";
+          ImGui::InputText("Title", newTitle, sizeof(newTitle));
+          ImGui::InputTextMultiline("Text", newText, sizeof(newText), ImVec2(-1, 200));
+          
+          if (ImGui::Button("Add")) {
+            if (strlen(newText) > 0) { // Require at least some text
+              currStep.CustomMessages.push_back({newTitle, newText});
+              memset(newTitle, 0, sizeof(newTitle));
+              memset(newText, 0, sizeof(newText));
+              ImGui::CloseCurrentPopup();
+            }
+          }
+          ImGui::SameLine();
+          if (ImGui::Button("Cancel")) {
+            memset(newTitle, 0, sizeof(newTitle));
+            memset(newText, 0, sizeof(newText));
+            ImGui::CloseCurrentPopup();
+          }
+          ImGui::EndPopup();
         }
       }
     }

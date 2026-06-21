@@ -1,7 +1,7 @@
 #pragma once
 #include "nexus/Nexus.h"
 
-#include "event_catalog.h"
+#include "event_catalog.h" 
 #include "train_manager.h"
 #include <vector>
 #include <cstring>
@@ -36,8 +36,5 @@ private:
   // Custom messages
   std::vector<std::string> m_CustomMessages;
   int m_SelectedCustomMessage = -1;
-  char m_NewMessageBuf[512];
-
-  void LoadCustomMessages();
-  void SaveCustomMessages();
+  char m_NewMessageBuf[4096];
 };

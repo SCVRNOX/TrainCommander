@@ -96,40 +96,11 @@ OverlayUI::OverlayUI(AddonAPI_t *api, TrainManager *manager, EventCatalog *catal
   if (m_API && m_API->Textures_Get) {
     m_Icon = m_API->Textures_Get("TC_ICON");
   }
-  // init custom messages buffer
+  // Initialize overlay state
   m_SelectedCustomMessage = -1;
   memset(m_NewMessageBuf, 0, sizeof(m_NewMessageBuf));
-  LoadCustomMessages();
-}
-
-void OverlayUI::LoadCustomMessages() {
-  m_CustomMessages.clear();
-  if (!m_Manager) return;
-  std::string dir = m_Manager->GetAddonDir();
-  std::string path = dir + "\\custom_messages.json";
-  std::ifstream file(path);
-  if (!file.is_open()) return;
-  try {
-    json j;
-    file >> j;
-    for (const auto &it : j["messages"]) {
-      m_CustomMessages.push_back(it.get<std::string>());
-    }
-  } catch (...) {
-  }
-}
-
-void OverlayUI::SaveCustomMessages() {
-  if (!m_Manager) return;
-  std::string dir = m_Manager->GetAddonDir();
-  CreateDirectoryA(dir.c_str(), NULL);
-  std::string path = dir + "\\custom_messages.json";
-  json j;
-  j["messages"] = json::array();
-  for (const auto &m : m_CustomMessages)
-    j["messages"].push_back(m);
-  std::ofstream file(path);
-  if (file.is_open()) file << j.dump(2);
+  m_PendingClipboardMsg.clear();
+  m_PendingPaste = false;
 }
 
 void OverlayUI::Render() {
@@ -172,6 +143,9 @@ void OverlayUI::Render() {
     }
     ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "Train: %s",
                        activeTrain->Name.c_str());
+    if (ImGui::Button("Deactivate Train")) {
+        m_Manager->SetActiveTrain(-1);
+    }
     ImGui::Separator();
 
     if (currentStepIdx >= 0 && currentStepIdx < activeTrain->Steps.size()) {
@@ -231,55 +205,7 @@ void OverlayUI::Render() {
         }
       }
 
-      // Custom messages manager
-      ImGui::Separator();
-      ImGui::Text("Custom Messages");
-      ImGui::InputTextMultiline("New message", m_NewMessageBuf, sizeof(m_NewMessageBuf), ImVec2(-1, 80));
-      if (ImGui::Button("Add Message")) {
-        std::string nm = m_NewMessageBuf;
-        if (!nm.empty()) {
-          m_CustomMessages.push_back(nm);
-          m_SelectedCustomMessage = (int)m_CustomMessages.size() - 1;
-          memset(m_NewMessageBuf, 0, sizeof(m_NewMessageBuf));
-          SaveCustomMessages();
-        }
-      }
-
-      if (!m_CustomMessages.empty()) {
-        ImGui::Spacing();
-        ImGui::Text("Saved messages:");
-        ImGui::BeginChild("msg_list", ImVec2(0, 120), true);
-        for (int i = 0; i < (int)m_CustomMessages.size(); ++i) {
-          const std::string &cm = m_CustomMessages[i];
-          if (ImGui::Selectable(cm.c_str(), m_SelectedCustomMessage == i)) {
-            m_SelectedCustomMessage = i;
-            // copy selected into edit buffer for quick edit
-            strncpy_s(m_NewMessageBuf, sizeof(m_NewMessageBuf), cm.c_str(), _TRUNCATE);
-          }
-        }
-        ImGui::EndChild();
-
-        ImGui::Spacing();
-        if (m_SelectedCustomMessage >= 0 && m_SelectedCustomMessage < (int)m_CustomMessages.size()) {
-          if (ImGui::Button("Copy Selected")) {
-            ImGui::SetClipboardText(m_CustomMessages[m_SelectedCustomMessage].c_str());
-            if (m_API && m_API->GUI_SendAlert)
-              m_API->GUI_SendAlert("Message copied to clipboard.");
-          }
-          ImGui::SameLine();
-          if (ImGui::Button("Update Selected")) {
-            m_CustomMessages[m_SelectedCustomMessage] = std::string(m_NewMessageBuf);
-            SaveCustomMessages();
-          }
-          ImGui::SameLine();
-          if (ImGui::Button("Delete Selected")) {
-            m_CustomMessages.erase(m_CustomMessages.begin() + m_SelectedCustomMessage);
-            m_SelectedCustomMessage = -1;
-            memset(m_NewMessageBuf, 0, sizeof(m_NewMessageBuf));
-            SaveCustomMessages();
-          }
-        }
-      }
+      // Custom messages manager - removed as custom messages are now stored per step in trains.json
 
       if (!currentStep.Mechanics.empty()) {
         ImGui::Spacing();
@@ -287,6 +213,30 @@ void OverlayUI::Render() {
         ImGui::TextWrapped("%s", currentStep.Mechanics.c_str());
         if (ImGui::Button("Copy Mechanics")) {
           ImGui::SetClipboardText(currentStep.Mechanics.c_str());
+        }
+      }
+
+      // Custom messages for current step
+      if (!currentStep.CustomMessages.empty()) {
+        ImGui::Spacing();
+        ImGui::TextColored(ImVec4(0.6f, 0.9f, 1.0f, 1.0f), "Custom Messages:");
+        // Show individual copy buttons for each custom message
+        for (size_t i = 0; i < currentStep.CustomMessages.size(); ++i) {
+          const auto& msg = currentStep.CustomMessages[i];
+          ImGui::PushID(static_cast<int>(i));
+          if (ImGui::Button(("Copy ##" + std::to_string(i)).c_str())) {
+            ImGui::SetClipboardText(msg.text.c_str());
+            if (m_API && m_API->GUI_SendAlert)
+              m_API->GUI_SendAlert(("Custom message \"" + msg.title + "\" copied to clipboard.").c_str());
+          }
+          ImGui::SameLine();
+          // Display the title, or if empty, show a placeholder
+          if (msg.title.empty()) {
+            ImGui::Text("(no title)");
+          } else {
+            ImGui::Text("%s", msg.title.c_str());
+          }
+          ImGui::PopID();
         }
       }
     }

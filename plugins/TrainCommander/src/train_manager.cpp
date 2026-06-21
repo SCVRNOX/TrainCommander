@@ -37,6 +37,14 @@ void TrainManager::LoadTrains() {
         step.Mechanics = jStep.value("Mechanics", "");
         step.SpawnMinuteUTC = jStep.value("SpawnMinuteUTC", -1);
         step.DurationMinutes = jStep.value("DurationMinutes", 0);
+        if (jStep.contains("CustomMessages") && jStep["CustomMessages"].is_array()) {
+          for (const auto &msgObj : jStep["CustomMessages"]) {
+            CustomMessage msg;
+            msg.title = msgObj.value("title", "");
+            msg.text = msgObj.value("text", "");
+            step.CustomMessages.push_back(msg);
+          }
+        }
         train.Steps.push_back(step);
       }
       m_Trains.push_back(train);
@@ -65,6 +73,13 @@ void TrainManager::SaveTrains() {
       jStep["Mechanics"] = step.Mechanics;
       jStep["SpawnMinuteUTC"] = step.SpawnMinuteUTC;
       jStep["DurationMinutes"] = step.DurationMinutes;
+      jStep["CustomMessages"] = json::array();
+      for (const auto &msg : step.CustomMessages) {
+        json jMsg;
+        jMsg["title"] = msg.title;
+        jMsg["text"] = msg.text;
+        jStep["CustomMessages"].push_back(jMsg);
+      }
       jTrain["steps"].push_back(jStep);
     }
     j["trains"].push_back(jTrain);
@@ -126,6 +141,17 @@ bool TrainManager::ImportFromClipboard(const std::string &base64Json) {
       step.Description = jStep.value("Description", "");
       step.WaypointCode = jStep.value("WaypointCode", "");
       step.SquadMessage = jStep.value("SquadMessage", "");
+      step.Mechanics = jStep.value("Mechanics", "");
+      step.SpawnMinuteUTC = jStep.value("SpawnMinuteUTC", -1);
+      step.DurationMinutes = jStep.value("DurationMinutes", 0);
+      if (jStep.contains("CustomMessages") && jStep["CustomMessages"].is_array()) {
+        for (const auto &msgObj : jStep["CustomMessages"]) {
+          CustomMessage msg;
+          msg.title = msgObj.value("title", "");
+          msg.text = msgObj.value("text", "");
+          step.CustomMessages.push_back(msg);
+        }
+      }
       train.Steps.push_back(step);
     }
 
@@ -154,6 +180,16 @@ std::string TrainManager::ExportToClipboard(int trainIndex) {
     jStep["Description"] = step.Description;
     jStep["WaypointCode"] = step.WaypointCode;
     jStep["SquadMessage"] = step.SquadMessage;
+    jStep["Mechanics"] = step.Mechanics;
+    jStep["SpawnMinuteUTC"] = step.SpawnMinuteUTC;
+    jStep["DurationMinutes"] = step.DurationMinutes;
+    jStep["CustomMessages"] = json::array();
+    for (const auto &msg : step.CustomMessages) {
+      json jMsg;
+      jMsg["title"] = msg.title;
+      jMsg["text"] = msg.text;
+      jStep["CustomMessages"].push_back(jMsg);
+    }
     jTrain["steps"].push_back(jStep);
   }
 

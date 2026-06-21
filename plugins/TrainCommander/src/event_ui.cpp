@@ -254,8 +254,18 @@ void EventUI::Render() {
                   gmtime_s(&utcNow, &t_now);
                   int currentUTCMinute = utcNow.tm_hour * 60 + utcNow.tm_min;
 
-                  int spawnMinute =
-                      (int)(currentUTCMinute + ev.ExactMinutesUntilSpawn);
+                  // Compute UTC spawn minute. Use ceiling for future spawns to
+                  // avoid truncating fractional minutes which can make the
+                  // overlay consider the event active prematurely. For past
+                  // spawns keep floor to preserve negative offsets.
+                  double exact = ev.ExactMinutesUntilSpawn;
+                  int deltaMinutes;
+                  if (exact > 0.0)
+                    deltaMinutes = static_cast<int>(std::ceil(exact));
+                  else
+                    deltaMinutes = static_cast<int>(std::floor(exact));
+
+                  int spawnMinute = currentUTCMinute + deltaMinutes;
                   spawnMinute = ((spawnMinute % 1440) + 1440) % 1440;
                   newStep.SpawnMinuteUTC = spawnMinute;
                 }
