@@ -256,7 +256,7 @@ void OverlayUI::Render() {
 
     if (ImGui::Button("Next >") &&
         currentStepIdx < activeTrain->Steps.size() - 1) {
-      m_Manager->NextStep();
+      m_manager->NextStep();
     }
 
     ImGui::Spacing();
