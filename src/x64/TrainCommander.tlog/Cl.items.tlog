@@ -1,0 +1,12 @@
+C:\GWPlugin\src\entry.cpp;C:\GWPlugin\src\x64\entry.obj
+C:\GWPlugin\src\imgui\imgui.cpp;C:\GWPlugin\src\x64\imgui.obj
+C:\GWPlugin\src\imgui\imgui_demo.cpp;C:\GWPlugin\src\x64\imgui_demo.obj
+C:\GWPlugin\src\imgui\imgui_draw.cpp;C:\GWPlugin\src\x64\imgui_draw.obj
+C:\GWPlugin\src\imgui\imgui_tables.cpp;C:\GWPlugin\src\x64\imgui_tables.obj
+C:\GWPlugin\src\imgui\imgui_widgets.cpp;C:\GWPlugin\src\x64\imgui_widgets.obj
+C:\GWPlugin\src\train_manager.cpp;C:\GWPlugin\src\x64\train_manager.obj
+C:\GWPlugin\src\base64.cpp;C:\GWPlugin\src\x64\base64.obj
+C:\GWPlugin\src\editor_ui.cpp;C:\GWPlugin\src\x64\editor_ui.obj
+C:\GWPlugin\src\overlay_ui.cpp;C:\GWPlugin\src\x64\overlay_ui.obj
+C:\GWPlugin\src\event_catalog.cpp;C:\GWPlugin\src\x64\event_catalog.obj
+C:\GWPlugin\src\event_ui.cpp;C:\GWPlugin\src\x64\event_ui.obj
