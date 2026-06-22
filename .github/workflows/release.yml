@@ -1,0 +1,33 @@
+name: Build and Release TrainCommander
+
+on:
+  push:
+    branches:
+      - main
+  tags:
+    - 'v[0-9]*.[0-9]*.[0-9]*' 
+
+jobs:
+  build_and_test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+
+      - name: Install Dependencies/Tools
+        run: |
+          echo "Setting up build environment..."
+          # Add any necessary setup commands here (e.g., installing vcpkg dependencies)
+
+      - name: Build DLL Artifact
+        run: |
+          # Use MSBuild with explicit parameters to match local settings
+          msbuild TrainCommander.vcxproj /p:Configuration=Release /p:Platform=x64
+        env:
+
+      - name: Upload DLL Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrainCommander-DLL-${{ github.ref_name }} # Names the artifact based on the tag/branch
+          path: x64/TrainCommander.dll
